@@ -1,11 +1,10 @@
 import express from "express";
 import http from "http";
-import { Server } from "socket.io";
-import { join } from "./src/socket-actions";
-import { cleanupSessions } from "./src/lib";
-import { Session } from "./src/services";
+import { Server, Socket } from "socket.io";
 import cors from "cors";
-import router from "./src/router";
+// import router from "./src/router";
+import { userHandlers as registerUserHandlers } from "./src/handlers";
+import { cardHandlers as registerCardHandlers } from "./src/handlers";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -14,17 +13,28 @@ const io = new Server(httpServer, {
 });
 
 app.use(cors());
-app.use("/api", router);
-
-export const activeSessions = new Map<string, Session>();
-setInterval(() => cleanupSessions(activeSessions), 60 * 60 * 1000); // Run cleanup every hour
+// app.use("/api", router);
 
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
-  join({ socket, activeSessions });
+  const { roomId, roomName } = socket.handshake.query;
 
-  socket.on("disconnect", () => console.log("disconnected"));
+  Object.defineProperty(socket, "roomId", {
+    value: roomId,
+    writable: true,
+    enumerable: true,
+    configurable: true,
+  });
+
+  if (typeof roomId === "string") {
+    socket.join(roomId);
+  }
+
+  registerUserHandlers({ io, socket: socket as Socket & { roomId: string } });
+  registerCardHandlers({ io, socket: socket as Socket & { roomId: string } });
+
+  // join({ socket, activeSessions });
 });
 
 httpServer.listen(3000, () => {
