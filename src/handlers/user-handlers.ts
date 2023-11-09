@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 
-const users: Record<string, { userName: string; online: boolean }> = {};
+export const users: Record<string, { userName: string; online: boolean }> = {};
 
 export const userHandlers = ({
   io,
@@ -34,7 +34,7 @@ export const userHandlers = ({
     getUsers();
   };
 
-  socket.on("user:get", getUsers);
+  socket.on("users:get", getUsers);
   socket.on("user:add", addUser);
   socket.on("user:leave", removeUser);
 };

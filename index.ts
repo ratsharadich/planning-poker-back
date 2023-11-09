@@ -18,7 +18,7 @@ app.use(cors());
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
 
-  const { roomId, roomName } = socket.handshake.query;
+  const { roomId } = socket.handshake.query;
 
   Object.defineProperty(socket, "roomId", {
     value: roomId,
@@ -33,8 +33,6 @@ io.on("connection", (socket) => {
 
   registerUserHandlers({ io, socket: socket as Socket & { roomId: string } });
   registerCardHandlers({ io, socket: socket as Socket & { roomId: string } });
-
-  // join({ socket, activeSessions });
 });
 
 httpServer.listen(3000, () => {
