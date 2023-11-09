@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { UserId, UserList, UserName } from "./types";
+import { ACTIONS, UserId, UserList, UserName } from "./types";
 
 export const users: UserList = {};
 
@@ -35,7 +35,7 @@ export const userHandlers = ({
     getUsers();
   };
 
-  socket.on("users:get", getUsers);
-  socket.on("user:add", addUser);
-  socket.on("user:leave", removeUser);
+  socket.on(ACTIONS.GET_USERS, getUsers);
+  socket.on(ACTIONS.ADD_USER, addUser);
+  socket.on(ACTIONS.USER_LEAVE, removeUser);
 };

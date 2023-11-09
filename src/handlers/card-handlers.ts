@@ -1,4 +1,4 @@
-import { CardValue, CardsState, UserId } from "./types";
+import { ACTIONS, CardValue, CardsState, UserId } from "./types";
 import { Server, Socket } from "socket.io";
 import { users } from "./user-handlers";
 
@@ -41,9 +41,9 @@ export const cardHandlers = ({
     }
   };
 
-  socket.on("cards:get", getCards);
-  socket.on("card:update", updateCard);
+  socket.on(ACTIONS.GET_CARDS, getCards);
+  socket.on(ACTIONS.UPDATE_CARD, updateCard);
 
-  socket.on("user:add", getCards);
-  socket.on("user:leave", removeCard);
+  socket.on(ACTIONS.ADD_USER, getCards);
+  socket.on(ACTIONS.USER_LEAVE, removeCard);
 };

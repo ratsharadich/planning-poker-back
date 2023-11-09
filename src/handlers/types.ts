@@ -2,6 +2,7 @@ export enum ACTIONS {
   ADD_USER = "user:add",
   USER_LEAVE = "user:leave",
   GET_CARDS = "cards:get",
+  GET_USERS = "users:get",
   UPDATE_CARD = "card:update",
 }
 
