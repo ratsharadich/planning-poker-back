@@ -1,10 +1,8 @@
+import { CardValue, CardsState, UserId } from "./types";
 import { Server, Socket } from "socket.io";
 import { users } from "./user-handlers";
 
-const cards: {
-  showed: boolean;
-  list: Record<string, { userId: string; value: string | number }>;
-} = {
+const cards: CardsState = {
   showed: false,
   list: {},
 };
@@ -30,14 +28,14 @@ export const cardHandlers = ({
     userId,
     value,
   }: {
-    userId: string;
-    value: string | number;
+    userId: UserId;
+    value: CardValue;
   }) => {
     cards.list[userId] = { userId, value };
     getCards();
   };
 
-  const removeCard = ({ userId }: { userId: string }) => {
+  const removeCard = ({ userId }: { userId: UserId }) => {
     if (cards.list[userId]) {
       delete cards.list[userId];
     }

@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
+import { UserId, UserList, UserName } from "./types";
 
-export const users: Record<string, { userName: string; online: boolean }> = {};
+export const users: UserList = {};
 
 export const userHandlers = ({
   io,
@@ -17,8 +18,8 @@ export const userHandlers = ({
     userName,
     userId,
   }: {
-    userName: string;
-    userId: string;
+    userName: UserName;
+    userId: UserId;
   }) => {
     if (!users[userId]) {
       users[userId] = { userName, online: true };
