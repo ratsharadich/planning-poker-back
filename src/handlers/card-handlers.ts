@@ -3,7 +3,7 @@ import { Server, Socket } from "socket.io";
 import { users } from "./user-handlers";
 
 const cards: CardsState = {
-  showed: false,
+  shown: false,
   list: {},
 };
 
@@ -17,7 +17,7 @@ export const cardHandlers = ({
   const getCards = () => {
     for (let userId in users) {
       if (!cards.list[userId]) {
-        cards.list[userId] = { userId, value: "" };
+        cards.list[userId] = "";
       }
     }
 
@@ -31,7 +31,17 @@ export const cardHandlers = ({
     userId: UserId;
     value: CardValue;
   }) => {
-    cards.list[userId] = { userId, value };
+    if (cards.list[userId] === value) {
+      cards.list[userId] = "";
+    } else {
+      cards.list[userId] = value;
+    }
+
+    getCards();
+  };
+
+  const setCardsShown = ({ show }: { show: boolean }) => {
+    cards.shown = show;
     getCards();
   };
 
@@ -43,6 +53,7 @@ export const cardHandlers = ({
 
   socket.on(ACTIONS.GET_CARDS, getCards);
   socket.on(ACTIONS.UPDATE_CARD, updateCard);
+  socket.on(ACTIONS.SHOW_CARDS, setCardsShown);
 
   socket.on(ACTIONS.ADD_USER, getCards);
   socket.on(ACTIONS.USER_LEAVE, removeCard);
