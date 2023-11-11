@@ -1,6 +1,9 @@
 import { Sequelize } from "sequelize-typescript";
 import * as dotenv from "dotenv";
 import Room from "../models/room";
+import User from "../models/user";
+import Card from "../models/card";
+import UserRoomAssociation from "../models/associations/user-room-association";
 
 dotenv.config();
 
@@ -26,7 +29,7 @@ class Database {
         host: this.POSTGRES_HOST,
         port: Number(this.POSTGRES_PORT),
         dialect: "postgres",
-        models: [Room],
+        models: [Room, User, Card, UserRoomAssociation],
       });
 
       await this.sequelize.authenticate();

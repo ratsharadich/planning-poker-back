@@ -1,65 +1,85 @@
+import Card from "../models/card";
 import Room from "../models/room";
+import User from "../models/user";
 
 interface IRoomRepo {
-  create(room: Room): Promise<void>;
-  update(room: Room): Promise<void>;
-  delete(id: number): Promise<void>;
-  retrieveById(id: number): Promise<Room>;
-  retrieveAll(id: number): Promise<Room[]>;
+  create(room: Room, userIds: string[]): Promise<void>;
+  update(room: Room, userIds: string[]): Promise<void>;
+  delete(id: string): Promise<void>;
+  retrieveById(id: string): Promise<Room>;
+  retrieveAll(): Promise<Room[]>;
 }
 
 export class RoomRepo implements IRoomRepo {
-  async create(room: Room): Promise<void> {
+  async create(room: Room, userIds: string[]): Promise<void> {
+    const transaction = await Room.sequelize?.transaction();
+
     try {
-      await Room.create({ name: room.name });
+      const newRoom = await Room.create({ name: room.name }, { transaction });
+      await newRoom.$add("users", userIds, { transaction });
+      await transaction?.commit();
     } catch (error) {
+      await transaction?.rollback();
       throw new Error("Failed to create room!");
     }
   }
 
-  async update(room: Room): Promise<void> {
+  async update(room: Room, userIds: string[]): Promise<void> {
+    const transaction = await Room.sequelize?.transaction();
+
     try {
-      const newRoom = await Room.findOne({
-        where: {
-          id: room.id,
-        },
+      const updatedRoom = await Room.findOne({
+        where: { id: room.id },
       });
 
-      if (!newRoom) {
+      if (!updatedRoom) {
         throw new Error("Room is not found!");
       }
 
-      newRoom.name = room.name;
-      await newRoom.save();
+      updatedRoom.name = room.name;
+      await updatedRoom.save({ transaction });
+      await updatedRoom.$set("users", userIds, { transaction });
+      await transaction?.commit();
     } catch (error) {
+      await transaction?.rollback();
       throw new Error("Failed to update room!");
     }
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
+    const transaction = await Room.sequelize?.transaction();
+
     try {
-      const newRoom = await Room.findOne({
-        where: {
-          id,
-        },
+      const roomToDelete = await Room.findOne({
+        where: { id },
       });
 
-      if (!newRoom) {
+      if (!roomToDelete) {
         throw new Error("Room is not found!");
       }
 
-      await newRoom.destroy();
+      await roomToDelete.destroy({ transaction });
+      await transaction?.commit();
     } catch (error) {
-      throw new Error("Failed to create room!");
+      await transaction?.rollback();
+      throw new Error("Failed to delete room!");
     }
   }
 
-  async retrieveById(id: number): Promise<Room> {
+  async retrieveById(id: string): Promise<Room> {
     try {
       const newRoom = await Room.findOne({
-        where: {
-          id,
-        },
+        where: { id },
+        include: [
+          {
+            model: User,
+            include: [
+              {
+                model: Card,
+              },
+            ],
+          },
+        ],
       });
 
       if (!newRoom) {
@@ -68,7 +88,7 @@ export class RoomRepo implements IRoomRepo {
 
       return newRoom;
     } catch (error) {
-      throw new Error("Failed to create room!");
+      throw new Error("Failed to retrieve room!");
     }
   }
 
@@ -76,7 +96,7 @@ export class RoomRepo implements IRoomRepo {
     try {
       return await Room.findAll();
     } catch (error) {
-      throw new Error("Failed to create room!");
+      throw new Error("Failed to retrieve all rooms!");
     }
   }
 }

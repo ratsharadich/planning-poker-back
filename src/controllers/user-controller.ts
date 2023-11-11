@@ -1,18 +1,21 @@
 import { Request, Response } from "express";
-import Room from "../models/room";
-import { RoomRepo } from "../repository/room-repo";
+import User from "../models/user";
+import { UserRepo } from "../repository/user-repo";
 
-class RoomController {
+class UserController {
   async create(req: Request, res: Response) {
     try {
-      const newRoom = new Room();
-      newRoom.name = req.body.name;
+      const newUser = new User();
+      newUser.name = req.body.name;
 
-      await new RoomRepo().create(newRoom, []);
+      const roomIds = req.body.roomIds; // Assuming you have a field called roomIds in the request
+      const cardIds = req.body.cardIds; // Assuming you have a field called cardIds in the request
+
+      await new UserRepo().create(newUser, roomIds, cardIds);
 
       res.status(201).json({
-        status: "Created room!",
-        message: "Successfully create room!",
+        status: "Created user!",
+        message: "Successfully created user!",
       });
     } catch (error) {
       console.error(error);
@@ -26,11 +29,11 @@ class RoomController {
   async delete(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      await new RoomRepo().delete(id);
+      await new UserRepo().delete(id);
 
       res.status(200).json({
-        status: "Deleted room!",
-        message: "Successfully deleted room!",
+        status: "Deleted user!",
+        message: "Successfully deleted user!",
       });
     } catch (error) {
       console.error(error);
@@ -43,12 +46,12 @@ class RoomController {
 
   async findAll(req: Request, res: Response) {
     try {
-      const rooms = await new RoomRepo().retrieveAll();
+      const users = await new UserRepo().retrieveAll();
 
       res.status(200).json({
-        status: "Fetched all rooms!",
-        message: "Successfully fetched all rooms!",
-        data: rooms,
+        status: "Fetched all users!",
+        message: "Successfully fetched all users!",
+        data: users,
       });
     } catch (error) {
       console.error(error);
@@ -62,19 +65,19 @@ class RoomController {
   async findById(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const room = await new RoomRepo().retrieveById(id);
+      const user = await new UserRepo().retrieveById(id);
 
-      if (!room) {
+      if (!user) {
         return res.status(404).json({
           status: "Not Found",
-          message: "Room not found",
+          message: "User not found",
         });
       }
 
       res.status(200).json({
-        status: "Retrieved room!",
-        message: "Successfully retrieved room by id!",
-        data: room,
+        status: "Retrieved user!",
+        message: "Successfully retrieved user by id!",
+        data: user,
       });
     } catch (error) {
       console.error(error);
@@ -88,17 +91,18 @@ class RoomController {
   async update(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const userIds = req.body.userids;
-      const room = new Room();
+      const roomIds = req.body.roomIds; // Assuming you have a field called roomIds in the request
+      const cardIds = req.body.cardIds; // Assuming you have a field called cardIds in the request
 
-      room.id = id;
-      room.name = req.body.name;
+      const user = new User();
+      user.id = id;
+      user.name = req.body.name;
 
-      await new RoomRepo().update(room, userIds);
+      await new UserRepo().update(user, roomIds, cardIds);
 
       res.status(201).json({
-        status: "Updated room!",
-        message: "Successfully updated room!",
+        status: "Updated user!",
+        message: "Successfully updated user!",
       });
     } catch (error) {
       console.error(error);
@@ -110,4 +114,4 @@ class RoomController {
   }
 }
 
-export default new RoomController();
+export default new UserController();

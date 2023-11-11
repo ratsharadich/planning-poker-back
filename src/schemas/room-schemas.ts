@@ -11,7 +11,13 @@ export const updatedRoomSchema = z.object({
     .object({
       id: z
         .string()
-        .min(1, { message: "Name must be greater that one character!" }),
+        .min(1, { message: "Name must be greater that one character!" })
+        .refine(
+          (value) => /^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i.test(value),
+          {
+            message: "Invalid UUID format for id!",
+          }
+        ),
     })
     .partial(),
 });

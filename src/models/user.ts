@@ -3,20 +3,22 @@ import {
   DataType,
   Model,
   Table,
+  ForeignKey,
+  BelongsTo,
   HasMany,
   Default,
   PrimaryKey,
   BelongsToMany,
 } from "sequelize-typescript";
 import { v4 as uuidv4 } from "uuid";
-import User from "./user";
+import Room from "./room";
 import Card from "./card";
 import UserRoomAssociation from "./associations/user-room-association";
 
 @Table({
-  tableName: "rooms",
+  tableName: "users",
 })
-class Room extends Model {
+class User extends Model {
   @Default(uuidv4)
   @PrimaryKey
   @Column({
@@ -27,14 +29,15 @@ class Room extends Model {
 
   @Column({
     type: DataType.STRING,
+    allowNull: false,
   })
   name!: string;
 
-  @BelongsToMany(() => User, () => UserRoomAssociation)
-  users!: User[];
+  @BelongsToMany(() => Room, () => UserRoomAssociation)
+  rooms!: Room[];
 
   @HasMany(() => Card)
   cards!: Card[];
 }
 
-export default Room;
+export default User;

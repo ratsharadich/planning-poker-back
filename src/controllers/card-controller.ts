@@ -1,18 +1,20 @@
 import { Request, Response } from "express";
-import Room from "../models/room";
-import { RoomRepo } from "../repository/room-repo";
+import Card from "../models/card";
+import { CardRepo } from "../repository/card-repo";
 
-class RoomController {
+class CardController {
   async create(req: Request, res: Response) {
     try {
-      const newRoom = new Room();
-      newRoom.name = req.body.name;
+      const newCard = new Card();
+      newCard.value = req.body.value;
+      newCard.userId = req.body.userId;
+      newCard.roomId = req.body.roomId;
 
-      await new RoomRepo().create(newRoom, []);
+      await new CardRepo().create(newCard);
 
       res.status(201).json({
-        status: "Created room!",
-        message: "Successfully create room!",
+        status: "Created card!",
+        message: "Successfully created card!",
       });
     } catch (error) {
       console.error(error);
@@ -26,11 +28,11 @@ class RoomController {
   async delete(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      await new RoomRepo().delete(id);
+      await new CardRepo().delete(id);
 
       res.status(200).json({
-        status: "Deleted room!",
-        message: "Successfully deleted room!",
+        status: "Deleted card!",
+        message: "Successfully deleted card!",
       });
     } catch (error) {
       console.error(error);
@@ -43,12 +45,12 @@ class RoomController {
 
   async findAll(req: Request, res: Response) {
     try {
-      const rooms = await new RoomRepo().retrieveAll();
+      const cards = await new CardRepo().retrieveAll();
 
       res.status(200).json({
-        status: "Fetched all rooms!",
-        message: "Successfully fetched all rooms!",
-        data: rooms,
+        status: "Fetched all cards!",
+        message: "Successfully fetched all cards!",
+        data: cards,
       });
     } catch (error) {
       console.error(error);
@@ -62,19 +64,19 @@ class RoomController {
   async findById(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const room = await new RoomRepo().retrieveById(id);
+      const card = await new CardRepo().retrieveById(id);
 
-      if (!room) {
+      if (!card) {
         return res.status(404).json({
           status: "Not Found",
-          message: "Room not found",
+          message: "Card not found",
         });
       }
 
       res.status(200).json({
-        status: "Retrieved room!",
-        message: "Successfully retrieved room by id!",
-        data: room,
+        status: "Retrieved card!",
+        message: "Successfully retrieved card by id!",
+        data: card,
       });
     } catch (error) {
       console.error(error);
@@ -88,17 +90,18 @@ class RoomController {
   async update(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const userIds = req.body.userids;
-      const room = new Room();
+      const updatedCard = {
+        id,
+        value: req.body.value,
+        userId: req.body.userId,
+        roomId: req.body.roomId,
+      };
 
-      room.id = id;
-      room.name = req.body.name;
-
-      await new RoomRepo().update(room, userIds);
+      await new CardRepo().update(updatedCard);
 
       res.status(201).json({
-        status: "Updated room!",
-        message: "Successfully updated room!",
+        status: "Updated card!",
+        message: "Successfully updated card!",
       });
     } catch (error) {
       console.error(error);
@@ -110,4 +113,4 @@ class RoomController {
   }
 }
 
-export default new RoomController();
+export default new CardController();
