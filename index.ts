@@ -3,8 +3,8 @@ import http from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
 // import router from "./src/router";
-import { userHandlers as registerUserHandlers } from "./src/handlers";
-import { cardHandlers as registerCardHandlers } from "./src/handlers";
+import { userHandlers as registerUserHandlers } from "./src/socket-handlers";
+import { cardHandlers as registerCardHandlers } from "./src/socket-handlers";
 
 const app = express();
 const httpServer = http.createServer(app);
