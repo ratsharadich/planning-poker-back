@@ -31,12 +31,7 @@ export const cardHandlers = ({
     userId: UserId;
     value: CardValue;
   }) => {
-    if (cards.list[userId] === value) {
-      cards.list[userId] = "";
-    } else {
-      cards.list[userId] = value;
-    }
-
+    cards.list[userId] = value;
     getCards();
   };
 
