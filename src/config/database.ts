@@ -1,5 +1,6 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 import * as dotenv from "dotenv";
+import Room from "../models/room";
 
 dotenv.config();
 
@@ -17,23 +18,23 @@ class Database {
   }
 
   private async connectToPostgresSql() {
-    this.sequelize = new Sequelize({
-      database: this.POSTGRES_DB,
-      username: this.POSTGRES_USER,
-      password: this.POSTGRES_PASSWORD,
-      host: this.POSTGRES_HOST,
-      port: Number(this.POSTGRES_PORT),
-      dialect: "postgres",
-    });
+    try {
+      this.sequelize = new Sequelize({
+        database: this.POSTGRES_DB,
+        username: this.POSTGRES_USER,
+        password: this.POSTGRES_PASSWORD,
+        host: this.POSTGRES_HOST,
+        port: Number(this.POSTGRES_PORT),
+        dialect: "postgres",
+        models: [Room],
+      });
 
-    await this.sequelize
-      .authenticate()
-      .then(() =>
-        console.log("✅ PostgreSQL connection has been established successully")
-      )
-      .catch((error) =>
-        console.log("❌ Unable to connect to postgreSQL database", error)
-      );
+      await this.sequelize.authenticate();
+
+      console.log("✅ PostgreSQL connection has been established successully");
+    } catch (error) {
+      console.log("❌ Unable to connect to postgreSQL database", error);
+    }
   }
 }
 
