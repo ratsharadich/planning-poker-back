@@ -6,13 +6,18 @@ class RoomController {
   async create(req: Request, res: Response) {
     try {
       const newRoom = new Room();
-      newRoom.name = req.body.name;
+      const userId = req.body.userId;
 
-      await new RoomRepo().create(newRoom, []);
+      console.log(userId, "userId");
+
+      const roomId = await new RoomRepo().create(newRoom, [userId]);
+
+      newRoom.name = req.body.name;
 
       res.status(201).json({
         status: "Created room!",
         message: "Successfully create room!",
+        data: roomId,
       });
     } catch (error) {
       console.error(error);
@@ -88,13 +93,14 @@ class RoomController {
   async update(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const userIds = req.body.userids;
-      const room = new Room();
+      const roomName = req.body.name;
+      const room = await new RoomRepo().retrieveById(id);
 
-      room.id = id;
-      room.name = req.body.name;
+      if (roomName) {
+        room.name = roomName;
+      }
 
-      await new RoomRepo().update(room, userIds);
+      await new RoomRepo().update(room);
 
       res.status(201).json({
         status: "Updated room!",

@@ -3,7 +3,7 @@ import Room from "../models/room";
 import User from "../models/user";
 
 interface IRoomRepo {
-  create(room: Room, userIds: string[]): Promise<void>;
+  create(room: Room, userIds: string[]): Promise<string>;
   update(room: Room, userIds: string[]): Promise<void>;
   delete(id: string): Promise<void>;
   retrieveById(id: string): Promise<Room>;
@@ -11,20 +11,22 @@ interface IRoomRepo {
 }
 
 export class RoomRepo implements IRoomRepo {
-  async create(room: Room, userIds: string[]): Promise<void> {
+  async create(room: Room, userIds: string[]): Promise<string> {
     const transaction = await Room.sequelize?.transaction();
 
     try {
       const newRoom = await Room.create({ name: room.name }, { transaction });
       await newRoom.$add("users", userIds, { transaction });
       await transaction?.commit();
+
+      return newRoom.id;
     } catch (error) {
       await transaction?.rollback();
       throw new Error("Failed to create room!");
     }
   }
 
-  async update(room: Room, userIds: string[]): Promise<void> {
+  async update(room: Room): Promise<void> {
     const transaction = await Room.sequelize?.transaction();
 
     try {
@@ -38,7 +40,7 @@ export class RoomRepo implements IRoomRepo {
 
       updatedRoom.name = room.name;
       await updatedRoom.save({ transaction });
-      await updatedRoom.$set("users", userIds, { transaction });
+
       await transaction?.commit();
     } catch (error) {
       await transaction?.rollback();
@@ -57,6 +59,12 @@ export class RoomRepo implements IRoomRepo {
       if (!roomToDelete) {
         throw new Error("Room is not found!");
       }
+
+      // Delete associated cards
+      await Card.destroy({
+        where: { roomId: id },
+        transaction,
+      });
 
       await roomToDelete.destroy({ transaction });
       await transaction?.commit();

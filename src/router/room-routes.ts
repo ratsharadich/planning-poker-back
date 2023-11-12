@@ -3,7 +3,7 @@ import RoomController from "../controllers/room-controller";
 import validate from "../helpers/validate";
 import { createRoomSchema, updatedRoomSchema } from "../schemas/room-schemas";
 
-class RoomRouter extends BaseRouter {
+class RoomRoutes extends BaseRouter {
   public routes(): void {
     this.router.post("", validate(createRoomSchema), RoomController.create);
     this.router.patch(
@@ -17,4 +17,4 @@ class RoomRouter extends BaseRouter {
   }
 }
 
-export default new RoomRouter().router;
+export default new RoomRoutes().router;

@@ -1,10 +1,9 @@
-import { Sequelize } from "sequelize-typescript";
 import Card from "../models/card";
 import Room from "../models/room";
 import User from "../models/user";
 
 interface IUserRepo {
-  create(user: User, roomIds: string[], cardIds: string[]): Promise<void>;
+  create(user: User, roomIds: string[], cardIds: string[]): Promise<string>;
   update(user: User, roomIds: string[], cardIds: string[]): Promise<void>;
   delete(id: string): Promise<void>;
   retrieveById(id: string): Promise<User>;
@@ -12,29 +11,16 @@ interface IUserRepo {
 }
 
 export class UserRepo implements IUserRepo {
-  async create(
-    user: User,
-    roomIds: string[],
-    cardIds: string[]
-  ): Promise<void> {
-    const transaction = await User.sequelize?.transaction();
-
+  async create(user: User): Promise<string> {
     try {
-      const newUser = await User.create({ name: user.name }, { transaction });
-      await newUser.$add("rooms", roomIds, { transaction });
-      await newUser.$add("cards", cardIds, { transaction });
-      await transaction?.commit();
+      const newUser = await User.create({ name: user.name });
+      return newUser.id;
     } catch (error) {
-      await transaction?.rollback();
       throw new Error("Failed to create user!");
     }
   }
 
-  async update(
-    user: User,
-    roomIds: string[],
-    cardIds: string[]
-  ): Promise<void> {
+  async update(user: User): Promise<void> {
     const transaction = await User.sequelize?.transaction();
 
     try {
@@ -48,8 +34,6 @@ export class UserRepo implements IUserRepo {
 
       updatedUser.name = user.name;
       await updatedUser.save({ transaction });
-      await updatedUser.$set("rooms", roomIds, { transaction });
-      await updatedUser.$set("cards", cardIds, { transaction });
       await transaction?.commit();
     } catch (error) {
       await transaction?.rollback();
@@ -68,6 +52,12 @@ export class UserRepo implements IUserRepo {
       if (!userToDelete) {
         throw new Error("User is not found!");
       }
+
+      // Delete associated cards
+      await Card.destroy({
+        where: { userId: id },
+        transaction,
+      });
 
       await userToDelete.destroy({ transaction });
       await transaction?.commit();

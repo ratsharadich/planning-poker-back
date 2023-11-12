@@ -5,17 +5,21 @@ import { UserRepo } from "../repository/user-repo";
 class UserController {
   async create(req: Request, res: Response) {
     try {
+      const userName = req.body.name;
+
+      if (!userName) {
+        throw new Error("User name is necessary to create a user!");
+      }
+
       const newUser = new User();
-      newUser.name = req.body.name;
+      newUser.name = userName;
 
-      const roomIds = req.body.roomIds; // Assuming you have a field called roomIds in the request
-      const cardIds = req.body.cardIds; // Assuming you have a field called cardIds in the request
-
-      await new UserRepo().create(newUser, roomIds, cardIds);
+      const id = await new UserRepo().create(newUser);
 
       res.status(201).json({
         status: "Created user!",
         message: "Successfully created user!",
+        data: id,
       });
     } catch (error) {
       console.error(error);
@@ -90,15 +94,11 @@ class UserController {
 
   async update(req: Request, res: Response) {
     try {
-      const id = req.params.id;
-      const roomIds = req.body.roomIds; // Assuming you have a field called roomIds in the request
-      const cardIds = req.body.cardIds; // Assuming you have a field called cardIds in the request
-
       const user = new User();
-      user.id = id;
+      user.id = req.params.id;
       user.name = req.body.name;
 
-      await new UserRepo().update(user, roomIds, cardIds);
+      await new UserRepo().update(user);
 
       res.status(201).json({
         status: "Updated user!",

@@ -17,7 +17,7 @@ const validate =
 
       return res.status(400).json({
         status: "Bad request!",
-        message: error_message[0].message,
+        message: error_message,
       });
     }
   };

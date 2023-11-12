@@ -2,7 +2,9 @@ import express from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
-import RoomRouter from "./src/router/room-router";
+import RoomRoutes from "./src/router/room-routes";
+import CardRoutes from "./src/router/card-routes";
+import UserRoutes from "./src/router/user-routes";
 import { userHandlers as registerUserHandlers } from "./src/socket-handlers";
 import { cardHandlers as registerCardHandlers } from "./src/socket-handlers";
 import Database from "./src/config/database";
@@ -16,7 +18,10 @@ const io = new Server(httpServer, {
 });
 
 app.use(cors());
-app.use("/api/v1/room", RoomRouter);
+app.use(express.json());
+app.use("/api/v1/room", RoomRoutes);
+app.use("/api/v1/card", CardRoutes);
+app.use("/api/v1/user", UserRoutes);
 
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
@@ -41,7 +46,7 @@ io.on("connection", (socket) => {
 const startServer = async () => {
   await db.sequelize?.sync();
   httpServer.listen(3000, () => {
-    console.log("Server started on port 3000");
+    console.log("🤩 Server started on port 3000 🤩");
   });
 };
 

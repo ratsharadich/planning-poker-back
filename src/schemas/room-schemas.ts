@@ -1,9 +1,19 @@
 import { z } from "zod";
 
 export const createRoomSchema = z.object({
-  name: z
-    .string()
-    .min(1, { message: "Name must be greater that one character!" }),
+  body: z.object({
+    name: z
+      .string()
+      .min(1, { message: "Name must be greater than one character!" }),
+    userId: z
+      .string()
+      .refine(
+        (value) => /^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i.test(value),
+        {
+          message: "Invalid UUID format for roomIds!",
+        }
+      ),
+  }),
 });
 
 export const updatedRoomSchema = z.object({
@@ -20,4 +30,10 @@ export const updatedRoomSchema = z.object({
         ),
     })
     .partial(),
+  body: z.object({
+    name: z
+      .string()
+      .min(1, { message: "Name must be greater than one character!" })
+      .optional(),
+  }),
 });

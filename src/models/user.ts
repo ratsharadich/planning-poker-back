@@ -3,8 +3,6 @@ import {
   DataType,
   Model,
   Table,
-  ForeignKey,
-  BelongsTo,
   HasMany,
   Default,
   PrimaryKey,
