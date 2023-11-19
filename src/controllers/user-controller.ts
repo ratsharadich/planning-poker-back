@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import User from "../models/user";
-import { UserRepo } from "../repository/user-repo";
+import User from "../models/user-model";
+import { UserDb } from "../database/user-db";
 
 class UserController {
   async create(req: Request, res: Response) {
@@ -11,10 +11,7 @@ class UserController {
         throw new Error("User name is necessary to create a user!");
       }
 
-      const newUser = new User();
-      newUser.name = userName;
-
-      const id = await new UserRepo().create(newUser);
+      const id = await UserDb.create(userName);
 
       res.status(201).json({
         status: "Created user!",
@@ -22,43 +19,9 @@ class UserController {
         data: id,
       });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        status: "Internal Server Error!",
-        message: "Internal Server Error!",
-      });
-    }
-  }
-
-  async delete(req: Request, res: Response) {
-    try {
-      const id = req.params.id;
-      await new UserRepo().delete(id);
-
-      res.status(200).json({
-        status: "Deleted user!",
-        message: "Successfully deleted user!",
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        status: "Internal Server Error!",
-        message: "Internal Server Error!",
-      });
-    }
-  }
-
-  async findAll(req: Request, res: Response) {
-    try {
-      const users = await new UserRepo().retrieveAll();
-
-      res.status(200).json({
-        status: "Fetched all users!",
-        message: "Successfully fetched all users!",
-        data: users,
-      });
-    } catch (error) {
-      console.error(error);
+      if (error instanceof Error) {
+        console.error(error.message.red);
+      }
       res.status(500).json({
         status: "Internal Server Error!",
         message: "Internal Server Error!",
@@ -69,7 +32,7 @@ class UserController {
   async findById(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const user = await new UserRepo().retrieveById(id);
+      const user = await UserDb.findById(id);
 
       if (!user) {
         return res.status(404).json({
@@ -84,7 +47,9 @@ class UserController {
         data: user,
       });
     } catch (error) {
-      console.error(error);
+      if (error instanceof Error) {
+        console.error(error.message.red);
+      }
       res.status(500).json({
         status: "Internal Server Error!",
         message: "Internal Server Error!",
@@ -94,18 +59,39 @@ class UserController {
 
   async update(req: Request, res: Response) {
     try {
-      const user = new User();
-      user.id = req.params.id;
-      user.name = req.body.name;
+      const userId = req.params.id;
+      const userName = req.body.name;
 
-      await new UserRepo().update(user);
+      await UserDb.update(userId, userName);
 
-      res.status(201).json({
+      res.status(200).json({
         status: "Updated user!",
         message: "Successfully updated user!",
       });
     } catch (error) {
-      console.error(error);
+      if (error instanceof Error) {
+        console.error(error.message.red);
+      }
+      res.status(500).json({
+        status: "Internal Server Error!",
+        message: "Internal Server Error!",
+      });
+    }
+  }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const id = req.params.id;
+      await UserDb.delete(id);
+
+      res.status(200).json({
+        status: "Deleted user!",
+        message: "Successfully deleted user!",
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error.message.red);
+      }
       res.status(500).json({
         status: "Internal Server Error!",
         message: "Internal Server Error!",

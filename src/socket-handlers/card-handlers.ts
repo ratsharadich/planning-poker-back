@@ -1,6 +1,5 @@
 import { ACTIONS, CardValue, CardsState, UserId } from "./types";
 import { Server, Socket } from "socket.io";
-import { users } from "./user-handlers";
 
 const cards: CardsState = {
   shown: false,
@@ -14,16 +13,6 @@ export const cardHandlers = ({
   io: Server;
   socket: Socket & { roomId: string };
 }) => {
-  const getCards = () => {
-    for (let userId in users) {
-      if (!cards.list[userId]) {
-        cards.list[userId] = "";
-      }
-    }
-
-    io.in(socket.roomId).emit("cards", cards);
-  };
-
   const updateCard = ({
     userId,
     value,
@@ -50,6 +39,6 @@ export const cardHandlers = ({
   socket.on(ACTIONS.UPDATE_CARD, updateCard);
   socket.on(ACTIONS.SHOW_CARDS, setCardsShown);
 
-  socket.on(ACTIONS.ADD_USER, getCards);
-  socket.on(ACTIONS.USER_LEAVE, removeCard);
+  socket.on(ACTIONS.ADD_USER_TO_ROOM, getCards);
+  socket.on(ACTIONS.REMOVE_USER, removeCard);
 };
