@@ -6,7 +6,7 @@ export class CardDb {
     value,
   }: {
     id: string;
-    value?: string;
+    value: string;
   }): Promise<void> {
     try {
       const updatedCard = await Card.findOne({
@@ -17,9 +17,7 @@ export class CardDb {
         throw new Error("Card is not found!");
       }
 
-      if (value) {
-        updatedCard.value = value;
-      }
+      updatedCard.value = value;
 
       await updatedCard.save();
     } catch (error) {
@@ -27,20 +25,33 @@ export class CardDb {
     }
   }
 
-  static async findByRoomAndUserId(
-    roomId: string,
-    userId: string
-  ): Promise<Card> {
+  static async findAllByRoom(roomId: string): Promise<Card[]> {
     try {
-      const newCard = await Card.findOne({
-        where: { roomId, userId },
+      const cards = await Card.findAll({
+        where: { roomId },
       });
 
-      if (!newCard) {
+      if (!cards) {
         throw new Error("Card is not found!");
       }
 
-      return newCard;
+      return cards;
+    } catch (error) {
+      throw new Error("Failed to retrieve card!");
+    }
+  }
+
+  static async finById(id: string): Promise<Card> {
+    try {
+      const card = await Card.findOne({
+        where: { id },
+      });
+
+      if (!card) {
+        throw new Error("Card is not found!");
+      }
+
+      return card;
     } catch (error) {
       throw new Error("Failed to retrieve card!");
     }

@@ -12,7 +12,6 @@ class RoomRoutes extends BaseRouter {
       RoomController.update
     );
     this.router.delete("/:id", RoomController.delete);
-    this.router.get("", RoomController.findAll);
     this.router.get("/:id", RoomController.findById);
   }
 }

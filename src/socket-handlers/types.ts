@@ -1,10 +1,12 @@
 export enum ACTIONS {
-  ADD_USER_TO_ROOM = "user:add",
-  REMOVE_USER = "user:leave",
   GET_CARDS = "cards:get",
-  GET_USERS = "users:get",
   UPDATE_CARD = "card:update",
-  SHOW_CARDS = "cards:set-shown",
+  TOGGLE_ROOM_SHOW_STATE = "room:show",
+}
+
+export enum LISTENERS {
+  CARDS = "cards",
+  SHOW_STATE = "show-state",
 }
 
 export type UserId = string;

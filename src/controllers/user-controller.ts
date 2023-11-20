@@ -11,12 +11,12 @@ class UserController {
         throw new Error("User name is necessary to create a user!");
       }
 
-      const id = await UserDb.create(userName);
+      const userId = await UserDb.create(userName);
 
       res.status(201).json({
         status: "Created user!",
         message: "Successfully created user!",
-        data: id,
+        data: userId,
       });
     } catch (error) {
       if (error instanceof Error) {

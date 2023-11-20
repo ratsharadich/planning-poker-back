@@ -12,7 +12,6 @@ class UserRoutes extends BaseRouter {
       UserController.update
     );
     this.router.delete("/:id", UserController.delete);
-    this.router.get("", UserController.findAll);
     this.router.get("/:id", UserController.findById);
   }
 }

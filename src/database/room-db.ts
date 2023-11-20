@@ -50,9 +50,9 @@ export class RoomDb {
    * 3. if there is need to update room name - assign no name to gotten room by id
    * 4. save room changes
    * 5. if user id is passed: if there is user in room associations - remove it, if there isn't - add it and create new card for this user and current room
-   * @param {string} roomId - id of room to update
-   * @param {string} roomName - name of room to update
-   * @param {string} [userId] - optional user id
+   * @param {string} obj.roomId - id of room to update
+   * @param {string} obj.roomName - name of room to update
+   * @param {string} [obj.userId] - optional user id
    * @returns {Promise<void>}
    */
   static async update({
@@ -76,25 +76,16 @@ export class RoomDb {
 
       await room.save({ transaction });
 
-      // add or remove user from the room
       if (user) {
-        const users = await room.$get("users");
-        const hasUser = users.find(({ id }) => id === user.id);
-
-        if (hasUser) {
-          room.$remove("users", user.id, { transaction });
-        } else {
-          room.$add("users", user.id, { transaction });
-
-          await Card.create(
-            {
-              userId: user.id,
-              roomId: room.id,
-              value: "",
-            },
-            { transaction }
-          );
-        }
+        await room.$add("users", user.id, { transaction });
+        await Card.create(
+          {
+            userId: user.id,
+            roomId: room.id,
+            value: "",
+          },
+          { transaction }
+        );
       }
 
       await transaction?.commit();
@@ -144,6 +135,29 @@ export class RoomDb {
         console.error(error.message.red);
       }
       throw new Error("Failed to get room!");
+    }
+  }
+
+  /**
+   * toggle cards showing
+   * @param {string} id - room id
+   * @returns {Promise<boolean>}
+   */
+  static async toggleRoomShowState(id: string): Promise<void> {
+    const transaction = await Room.sequelize?.transaction();
+    try {
+      const room = await Room.findOne({ where: { id } });
+
+      if (room) {
+        room.showed = !room.showed;
+      }
+
+      room?.save({ transaction });
+
+      await transaction?.commit();
+    } catch (error) {
+      await transaction?.rollback();
+      throw new Error("Failed to toggle room cards showing state!");
     }
   }
 

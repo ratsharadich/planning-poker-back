@@ -32,6 +32,13 @@ class Room extends Model {
   })
   name!: string;
 
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+  })
+  showed!: boolean;
+
   @BelongsToMany(() => User, () => UserRoom)
   users!: User[];
 

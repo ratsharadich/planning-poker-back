@@ -5,8 +5,7 @@ import { Server, Socket } from "socket.io";
 import cors from "cors";
 import RoomRoutes from "./src/router/room-routes";
 import UserRoutes from "./src/router/user-routes";
-import { userHandlers as registerUserHandlers } from "./src/socket-handlers";
-import { cardHandlers as registerCardHandlers } from "./src/socket-handlers";
+import { handlers as registerSocketHandlers } from "./src/socket-handlers";
 import Database from "./src/config/database";
 
 const db = new Database();
@@ -38,16 +37,13 @@ io.on("connection", (socket) => {
     socket.join(roomId);
   }
 
-  registerUserHandlers({ io, socket: socket as Socket & { roomId: string } });
-  registerCardHandlers({ io, socket: socket as Socket & { roomId: string } });
+  registerSocketHandlers({ io, socket: socket as Socket & { roomId: string } });
 });
 
 const startServer = async () => {
   await db.sequelize?.sync({ alter: true });
   httpServer.listen(3000, () => {
-    console.log(" ");
-    console.log("🤩 Server started on port 3000 🤩");
-    console.log(" ");
+    console.log("Server started on port".bgWhite, "3000".red);
   });
 };
 
