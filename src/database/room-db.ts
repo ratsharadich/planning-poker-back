@@ -129,12 +129,13 @@ export class RoomDb {
       if (!newRoom) {
         throw new Error("Room is not found!");
       }
+
       return newRoom;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof Error) {
-        console.error(error.message.red);
+        throw new Error(error.message);
       }
-      throw new Error("Failed to get room!");
+      throw new Error(error);
     }
   }
 
@@ -150,9 +151,8 @@ export class RoomDb {
 
       if (room) {
         room.showed = !room.showed;
+        await room?.save({ transaction });
       }
-
-      room?.save({ transaction });
 
       await transaction?.commit();
     } catch (error) {

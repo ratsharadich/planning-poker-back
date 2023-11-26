@@ -38,6 +38,10 @@ io.on("connection", (socket) => {
   }
 
   registerSocketHandlers({ io, socket: socket as Socket & { roomId: string } });
+
+  socket.on("disconnect", (reason) => {
+    console.log(reason, "reason");
+  });
 });
 
 const startServer = async () => {

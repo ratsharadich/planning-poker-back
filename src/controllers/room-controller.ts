@@ -52,13 +52,6 @@ class RoomController {
       const id = req.params.id;
       const room = await RoomDb.findById(id);
 
-      if (!room) {
-        return res.status(404).json({
-          status: "Not Found",
-          message: "Room not found",
-        });
-      }
-
       res.status(200).json({
         status: "Retrieved room!",
         message: "Successfully retrieved room by id!",
@@ -67,11 +60,19 @@ class RoomController {
     } catch (error) {
       if (error instanceof Error) {
         console.error(error.message.red);
+
+        if (error.message === "Room is not found!") {
+          return res.status(404).json({
+            status: "Not Found",
+            message: error.message,
+          });
+        }
+
+        res.status(500).json({
+          status: "Internal Server Error!",
+          message: error.message,
+        });
       }
-      res.status(500).json({
-        status: "Internal Server Error!",
-        message: "Internal Server Error!",
-      });
     }
   }
 

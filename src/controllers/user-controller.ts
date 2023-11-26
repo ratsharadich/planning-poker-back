@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import User from "../models/user-model";
 import { UserDb } from "../database/user-db";
 
 class UserController {
@@ -21,7 +20,12 @@ class UserController {
     } catch (error) {
       if (error instanceof Error) {
         console.error(error.message.red);
+        res.status(500).json({
+          status: "Internal Server Error!",
+          message: error.message,
+        });
       }
+
       res.status(500).json({
         status: "Internal Server Error!",
         message: "Internal Server Error!",
