@@ -25,13 +25,13 @@ export const handlers = ({
 
   // patch
   const updateCard = async ({
-    cardId,
+    userId,
     value,
   }: {
-    cardId: string;
+    userId: string;
     value: string;
   }) => {
-    await CardDb.update({ id: cardId, value });
+    await CardDb.update({ userId, roomId: socket.roomId, value });
     getCards();
   };
 

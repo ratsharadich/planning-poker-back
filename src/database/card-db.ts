@@ -2,15 +2,17 @@ import Card from "../models/card-model";
 
 export class CardDb {
   static async update({
-    id,
+    userId,
+    roomId,
     value,
   }: {
-    id: string;
+    userId: string;
+    roomId: string;
     value: string;
   }): Promise<void> {
     try {
       const updatedCard = await Card.findOne({
-        where: { id },
+        where: { userId, roomId },
       });
 
       if (!updatedCard) {
